@@ -1,0 +1,70 @@
+# Claude local settings
+.claude/
+CLAUDE.md
+
+# Serena local settings
+.serena/
+
+# mcp local settings
+.mcp.json
+
+# test
+tests/
+
+# Internal documentation (not for public)
+internal_docs/
+
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build output
+dist/
+build/
+.mcp-built
+*.js
+*.d.ts
+*.js.map
+!src/**/*.ts
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# API Keys - NEVER commit these
+*.key
+*.pem
+secrets/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Test
+coverage/
+.nyc_output/
+
+# Temp
+tmp/
+temp/
+*.tmp
+
+# Lock files (optional - uncomment if you want to ignore)
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
+.playwright-mcp/

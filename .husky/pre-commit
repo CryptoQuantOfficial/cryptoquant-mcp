@@ -1,0 +1,17 @@
+#!/bin/sh
+
+# Check if any files in src/ are staged
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep "^src/" || true)
+
+if [ -n "$STAGED_FILES" ]; then
+    echo "Running lint..."
+    npm run lint
+    LINT_EXIT_CODE=$?
+
+    if [ $LINT_EXIT_CODE -ne 0 ]; then
+        echo ""
+        echo "Lint failed. Please fix the errors before committing."
+        exit 1
+    fi
+    echo "Lint passed."
+fi

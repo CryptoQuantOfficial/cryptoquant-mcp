@@ -1,0 +1,293 @@
+# Metric Descriptions for describe_metric() tool
+# Format: TOON (Token-Oriented Object Notation)
+# Schema: id, name, category, asset, description, thresholds, interpretation
+# Note: Commas in field values are replaced with semicolons
+
+metrics[200]{id,name,category,asset,description,thresholds,interpretation}:
+
+# ============================================================================
+# BTC - Market Data
+# ============================================================================
+price-ohlcv,Price OHLCV,market-data,btc,BTC price data including open; high; low; close; and volume. CryptoQuant's BTC Index Price is VWAP aggregated from all supported exchanges.,,Core price data for technical analysis and trading decisions
+open-interest,Open Interest,market-data,btc,BTC Perpetual Open Interest from derivative exchanges; unified to USD across all exchanges.,,Rising OI with price increase indicates strong trend; divergence signals potential reversal
+funding-rates,Funding Rates,market-data,btc,Funding rates represent traders' sentiment in perpetual swaps market. Positive rates mean longs pay shorts (bullish); negative rates mean shorts pay longs (bearish).,>0.1% extremely bullish/overheated|<-0.1% extremely bearish|near 0 neutral,Extreme funding rates often precede mean reversion; sustained positive rates indicate strong bullish conviction
+taker-buy-sell-stats,Taker Buy Sell Stats,market-data,btc,Taker buy/sell volume and ratios in perpetual swap markets; indicating active trading sentiment.,buy_sell_ratio >1 bullish|buy_sell_ratio <1 bearish,Taker buy dominance suggests aggressive buying pressure and potential upward momentum
+liquidations,Liquidations,market-data,btc,Forced market orders from leveraged position closures due to price volatility; indicating trader sentiment and market direction.,,Large liquidation spikes often mark local tops/bottoms and can accelerate price moves
+capitalization,Capitalization,market-data,btc,Market cap metrics including market_cap; realized_cap (UTXO-weighted); average_cap; delta_cap; and thermo_cap for fundamental analysis.,delta_cap near realized_cap market top|delta_cap low market bottom,Realized cap acts as on-chain VWAP; delta_cap oscillations help identify cycle extremes
+coinbase-premium-index,Coinbase Premium Index,market-data,btc,Percent difference between Coinbase (BTCUSD) and Binance (BTCUSDT) prices; indicating US institutional spot buying pressure.,>0 US buying pressure|<0 US selling pressure,Positive premium signals strong US institutional demand; useful for gauging Western market sentiment
+
+# ============================================================================
+# BTC - Market Indicator
+# ============================================================================
+estimated-leverage-ratio,Estimated Leverage Ratio,market-indicator,btc,Open interest divided by exchange BTC reserve; estimating average user leverage. High values indicate aggressive speculation.,high values rapid volatility expected,Elevated leverage ratio signals overheated market conditions and increased liquidation risk
+mvrv,MVRV,market-indicator,btc,Market-Value-to-Realized-Value ratio comparing market cap to realized cap; indicating if BTC is over/undervalued relative to holder cost basis.,<1 undervalued|1-3.7 neutral|>3.7 overvalued/top zone,Primary cycle indicator; extreme highs signal profit-taking zones; extreme lows signal accumulation opportunities
+stablecoin-supply-ratio,Stablecoin Supply Ratio,market-indicator,btc,Ratio of BTC market cap to total stablecoin supply; measuring potential buying power available for BTC.,low SSR high buying power|high SSR low buying power,Lower SSR indicates more dry powder available to buy BTC; suggesting potential bullish pressure
+sopr,Spent Output Profit Ratio,market-indicator,btc,Ratio of USD value at spent time vs created time for UTXOs; showing if market participants are selling at profit or loss.,>1 selling at profit|=1 break-even|<1 selling at loss,SOPR resetting to 1 in bull markets often marks local bottoms; sustained >1 indicates healthy profit-taking
+sopr-ratio,SOPR Ratio,market-indicator,btc,Long-term holder SOPR divided by short-term holder SOPR; indicating relative profit-taking behavior between cohorts.,high values LTH selling more than STH (potential top),Elevated SOPR ratio suggests long-term holders are distributing; often seen near market tops
+realized-price,Realized Price,market-indicator,btc,Realized Cap divided by total supply; representing average price weighted by supply that market participants paid for their coins.,price below realized price bear market|price above realized price bull market,Acts as on-chain support/resistance; price falling below realized price historically marks bear market lows
+utxo-realized-price-age-distribution,UTxO Realized Price Age Distribution,market-indicator,btc,Set of realized prices across different age bands; showing cost basis of different holder cohorts.,,Overlaying cohort realized prices helps identify key support/resistance levels by holder group
+asopr,Adjusted SOPR,market-indicator,btc,SOPR excluding coins younger than 1 hour to filter noise,<1 loss realization|>1 profit taking,More accurate than raw SOPR for trend analysis. Filters out exchange-related movements
+
+# ============================================================================
+# BTC - Exchange Flows
+# ============================================================================
+reserve,Exchange Reserve,exchange-flows,btc,Full historical on-chain balance of Bitcoin exchanges.,declining reserve bullish (accumulation)|rising reserve bearish (selling pressure),Decreasing exchange reserves indicate holders moving to cold storage; reducing available sell supply
+transactions-count-ef,Exchange Transactions Count,exchange-flows,btc,Number of transactions flowing in/out of Bitcoin exchanges.,,Transaction count spikes can signal increased trading activity and potential volatility
+inflow,Exchange Inflow,exchange-flows,btc,BTC flowing into exchange wallets; including total inflow and average transaction value.,high inflow potential selling pressure,Large inflows often precede selling; monitor for whale deposits signaling distribution
+outflow,Exchange Outflow,exchange-flows,btc,BTC flowing out of exchange wallets; including total outflow and average transaction value.,high outflow accumulation signal,Large outflows indicate accumulation as holders move coins to cold storage
+addresses-count-ef,Exchange Addresses Count,exchange-flows,btc,Number of addresses involved in exchange inflow/outflow transactions.,,Rising unique addresses suggests broader market participation
+netflow,Exchange Netflow,exchange-flows,btc,Difference between exchange inflows and outflows; showing net movement of coins to/from exchanges.,positive netflow selling pressure|negative netflow accumulation,Sustained negative netflow is bullish as it reduces tradeable supply on exchanges
+in-house-flow,In-House Flow,exchange-flows,btc,BTC movement within wallets of the same exchange; representing internal transfers.,,High in-house flow may indicate exchange wallet management or internal position changes
+exchange-whale-ratio,Exchange Whale Ratio,flow-indicator,btc,Ratio of top 10 inflow transactions to total inflows,>0.9 whale dominated|<0.5 retail dominated,Who is moving coins. High ratio means large players dominating exchange activity
+
+# ============================================================================
+# BTC - Network Data
+# ============================================================================
+block-bytes,Block Bytes,network-data,btc,Mean size in bytes of all blocks generated.,,Block size trends indicate network utilization and transaction demand
+block-count,Block Count,network-data,btc,Number of blocks generated in a given time window.,,Block count variations reflect mining difficulty adjustments and network health
+block-interval,Block Interval,network-data,btc,Average time between blocks in seconds.,<600s hashrate increasing|>600s hashrate decreasing,Shorter intervals indicate hashrate growth outpacing difficulty; longer intervals suggest miner stress
+utxo-count,UTXO Count,network-data,btc,Total number of unspent transaction outputs existing at a given point.,,Growing UTXO set indicates network expansion and holder base diversification
+fees,Fees,network-data,btc,Statistics on fees paid to miners including total fees; average fee per block; and fees as percentage of block reward.,,High fees indicate network congestion and strong transaction demand
+fees-transaction,Fees Transaction,network-data,btc,Average and median fee per transaction paid to miners.,,Per-transaction fee trends help gauge network demand and user urgency
+blockreward,Blockreward,network-data,btc,Sum of block rewards including mining rewards and transaction fees; also available in USD.,,Block reward USD value impacts miner profitability and potential selling pressure
+difficulty,Mining Difficulty,network-data,btc,Mean difficulty of mining a new block.,,Rising difficulty indicates growing network security and miner competition
+hashrate,Hash Rate,network-data,btc,Mean speed at which miners solve hash problems; displayed as hashes per second.,,Hashrate growth signals network health and miner confidence in long-term BTC value
+supply,Supply,network-data,btc,Bitcoin supply metrics including total supply and newly issued tokens per window.,,Supply growth rate decreases with each halving; reinforcing scarcity narrative
+tokens-transferred,Tokens Transferred,network-data,btc,Transaction volume metrics including total; mean; and median tokens transferred per transaction.,,On-chain volume spikes often accompany significant price movements
+velocity,Velocity,network-data,btc,Trailing 1-year transaction volume divided by current supply; measuring how actively money circulates.,,Low velocity suggests hodling behavior; high velocity indicates active trading/spending
+inflation,Inflation,network-data,btc,Daily inflation rate calculated by dividing newly issued tokens by total supply.,,Inflation rate decreases with halvings; making BTC increasingly scarce over time
+top100,Top100,network-data,btc,Metrics relating to top 100 BTC rich holder addresses.,,Top holder accumulation/distribution patterns can signal major market moves
+days-destroyed,Days Destroyed,network-data,btc,Tokens transferred multiplied by days since last movement; filtering noise by weighting long-dormant coins.,high values old coins moving,Spikes indicate long-term holders are moving coins; potentially for distribution
+
+# ============================================================================
+# BTC - Network Indicator
+# ============================================================================
+stock-to-flow,Stock to Flow,network-indicator,btc,Scarcity metric dividing circulating supply by newly supplied coins; similar to precious metals valuation.,,Higher S2F after halvings historically correlates with price appreciation cycles
+nvt,NVT Ratio,network-indicator,btc,Network Value to Transaction ratio - market cap divided by on-chain transaction volume; assessing if network value matches activity.,high NVT overvalued|low NVT undervalued,High NVT suggests price outpacing network usage; low NVT indicates undervaluation
+nvt-golden-cross,NVT Golden Cross,network-indicator,btc,Modified NVT index providing local tops and bottoms signals.,>2.2 downside risk|<-1.6 upside potential,Actionable signal: above 2.2 suggests overvaluation; below -1.6 suggests accumulation zone
+nvm,NVM,network-indicator,btc,Network Value to Metcalfe ratio - market cap divided by daily active addresses squared; based on Metcalfe's law.,low NVM undervalued|high NVM overvalued,Low NVM relative to history suggests network value is underestimated
+puell-multiple,Puell Multiple,network-indicator,btc,Mining revenue USD divided by 365-day MA mining revenue; showing historically low/high periods for miner income.,<0.5 accumulation zone|>4 overheated/distribution,Low Puell Multiple historically marks great buying opportunities; high values signal tops
+cdd,Coin Days Destroyed,network-indicator,btc,Sum of spent output alive days multiplied by value; giving weight to long-term holder movements. Includes supply-adjusted and binary CDD.,binary_cdd=1 above average old coin movement,High CDD spikes indicate long-term holders are distributing; often near market tops
+sca,Sum Coin Age,network-indicator,btc,Sum of unspent transaction output alive days multiplied by value; measuring accumulated holder conviction.,,Rising SCA indicates coins are being held longer; showing strong holder conviction
+mca,Mean Coin Age,network-indicator,btc,Mean of unspent transaction output alive days multiplied by value.,,Declining MCA suggests distribution as old coins are spent; rising MCA indicates accumulation
+nupl,Net Unrealized Profit/Loss,network-indicator,btc,Difference between market cap and realized cap divided by market cap; showing overall market profit/loss state.,>0.75 euphoria/greed|0.5-0.75 belief|0.25-0.5 optimism|0-0.25 hope|<0 capitulation,Extreme NUPL values mark cycle tops (euphoria) and bottoms (capitulation)
+nrpl,Net Realized Profit/Loss,network-indicator,btc,Net magnitude of realized profit or loss by holders spending coins; assessed relative to acquisition price.,,Large realized losses during downtrends can mark capitulation bottoms
+pnl-utxo,Profit and Loss (UTxO),network-indicator,btc,Number of UTXOs in profit vs loss by comparing creation and destruction prices.,,High percentage of UTXOs in profit indicates strong market position
+pnl-supply,Profit and Loss (Supply),network-indicator,btc,Sum of UTXO values in profit vs loss; weighted by coin amount for accurate supply tracking.,,Percentage of supply in profit helps gauge overall market health and sentiment
+sca-distribution,Sum Coin Age Distribution,network-indicator,btc,Distribution of long-term vs short-term holders weighted by UTXO age; highlighting long-term holder presence.,rising LTH ratio bullish,Increasing long-term SCA distribution ratio suggests accumulation and bullish momentum
+dormancy,Dormancy,network-indicator,btc,Average number of days destroyed per coin transacted; with supply-adjusted variant normalizing for supply growth.,,High dormancy indicates old coins are being spent; low dormancy suggests young coin activity
+utxo-age-distribution,UTxO Age Distribution,network-indicator,btc,Active supply distribution across age bands; summarizing long-term and short-term holder behavior.,,Shifting age bands reveal accumulation/distribution patterns across holder cohorts
+utxo-realized-age-distribution,UTxO Realized Age Distribution,network-indicator,btc,Active supply across age bands weighted by acquisition price; showing capitalization held by different cohorts.,,Reveals realized cap concentration across holder groups for deeper cycle analysis
+utxo-count-age-distribution,UTxO Count Age Distribution,network-indicator,btc,Number of holders across age bands; showing how many long-term vs short-term holders exist.,,Growing count in older bands indicates broadening long-term holder base
+spent-output-age-distribution,Spent Output Age Distribution,network-indicator,btc,Sum of spent outputs across age bands; showing which cohorts are spending their coins.,,Old coin spending spikes often signal distribution phases near cycle tops
+utxo-supply-distribution,UTxO Supply Distribution,network-indicator,btc,Active supply across balance bands; separating whale and retail behavior by holdings size.,,Whale accumulation in higher bands suggests institutional confidence
+utxo-realized-supply-distribution,UTxO Realized Supply Distribution,network-indicator,btc,Active supply across balance bands weighted by acquisition price; showing capitalization held by whales vs retail.,,Reveals cost basis distribution between retail and whale cohorts
+utxo-count-supply-distribution,UTxO Count Supply Distribution,network-indicator,btc,Number of holders across balance bands; showing whale vs retail participant counts.,,Growing retail participation indicates broadening market adoption
+spent-output-supply-distribution,Spent Output Supply Distribution,network-indicator,btc,Sum of spent outputs across balance bands; showing which holder sizes are spending.,,Whale spending in large bands often precedes significant price movements
+active-addresses,Active Addresses,network-indicator,btc,Number of unique addresses transacting daily,rising adoption|falling reduced activity,Network usage proxy. More active addresses = more organic usage
+transaction-count,Transaction Count,network-indicator,btc,Number of on-chain transactions per day,rising demand|falling reduced usage,Network demand. High transaction counts indicate active usage
+
+# ============================================================================
+# BTC - Miner Flows
+# ============================================================================
+miner-reserve,Miner Reserve,miner-flows,btc,Full historical on-chain balance of Bitcoin mining pools.,declining reserve bullish|rising reserve potential sell pressure,Miner reserve depletion may signal selling pressure; accumulation suggests confidence
+miner-transactions-count,Miner Transactions Count,miner-flows,btc,Number of transactions flowing in/out of Bitcoin miners.,,High miner transaction activity may precede significant market moves
+miner-inflow,Miner Inflow,miner-flows,btc,BTC flowing into mining pool wallets with average transaction value.,,Miner inflows from exchanges may indicate OTC deals or operational funding
+miner-outflow,Miner Outflow,miner-flows,btc,BTC flowing out of mining pool wallets with average transaction value.,high outflow potential selling,Large miner outflows often signal selling to cover operational costs
+miner-addresses-count,Miner Addresses Count,miner-flows,btc,Number of addresses involved in miner inflow/outflow transactions.,,Address count changes may indicate miner consolidation or distribution
+miner-hashrate,Miner Hashrate,miner-flows,btc,Mining pool hashrate inferred from percent of blocks mined multiplied by total network hashrate.,,Pool hashrate share changes indicate mining centralization trends
+miner-revenue,Miner Revenue,miner-flows,btc,Bitcoin earned by mining pool through block rewards (coinbase + transaction fees).,,Miner revenue trends impact selling pressure and network security investment
+miner-netflow,Miner Netflow,miner-flows,btc,Difference between miner inflows and outflows; showing net accumulation or distribution.,positive netflow accumulation|negative netflow selling,Sustained negative miner netflow indicates distribution; positive suggests accumulation
+miner-in-house-flow,Miner In-House Flow,miner-flows,btc,BTC movement within wallets of the same miner; representing internal transfers.,,Internal miner flows may indicate wallet management or position preparation
+
+# ============================================================================
+# BTC - Flow Indicator
+# ============================================================================
+exchange-shutdown-index,Exchange Shutdown Index,flow-indicator,btc,Identifies sudden increases then zeroing of exchange outflows; potentially detecting hacks or shutdowns.,,Spikes may indicate exchange security incidents or operational issues
+fund-flow-ratio,Fund Flow Ratio,flow-indicator,btc,Amount of BTC that exchanges occupy among all BTC sent on the network; measuring trading involvement.,high ratio high trading activity,Rising fund flow ratio indicates increased exchange-related activity and potential volatility
+mpi,Miners Position Index (MPI),flow-indicator,btc,Z-score of miner outflows highlighting periods of extremely high or low miner selling activity.,>2 heavy miner selling|<0 low selling pressure,MPI above 2 signals significant miner distribution; below 0 indicates accumulation
+stablecoins-ratio,Stablecoins Ratio,flow-indicator,btc,BTC reserve divided by all stablecoins reserve on an exchange; indicating potential sell pressure.,high ratio potential selling pressure|low ratio buying power available,Low stablecoins ratio suggests dry powder available for BTC purchases
+exchange-inflow-age-distribution,Exchange Inflow Age Distribution,flow-indicator,btc,Active inflows to exchanges across age bands; showing which holder cohorts are depositing to exchanges.,,Old coin inflows to exchanges often signal long-term holder distribution
+exchange-inflow-supply-distribution,Exchange Inflow Supply Distribution,flow-indicator,btc,Active inflows to exchanges across balance bands; separating whale vs retail deposit behavior.,,Large balance band inflows indicate whale selling pressure
+exchange-inflow-cdd,Exchange Inflow CDD,flow-indicator,btc,Coin Days Destroyed for coins flowing into exchanges; noise-removed signal for exchange dumping.,high values old coins moving to exchanges,High exchange inflow CDD signals long-term holders preparing to sell
+exchange-supply-ratio,Exchange Supply Ratio,flow-indicator,btc,Exchange reserve divided by total supply; measuring percentage of BTC held on exchanges.,declining ratio bullish|rising ratio bearish,Lower exchange supply ratio indicates coins moving to cold storage; reducing sell pressure
+miner-supply-ratio,Miner Supply Ratio,flow-indicator,btc,Miner reserve divided by total supply; measuring percentage of BTC held by miners.,,Miner supply changes indicate accumulation or distribution by miners
+
+# ============================================================================
+# BTC - Inter-Entity Flows
+# ============================================================================
+exchange-to-exchange,Exchange to Exchange,inter-entity-flows,btc,Token flows between exchanges including total; mean; and transaction count for inter-exchange transfers.,,Large inter-exchange flows may indicate arbitrage or position repositioning
+exchange-to-miner,Exchange to Miner,inter-entity-flows,btc,Token flows from exchanges to mining pools; tracking exchange-to-miner fund movements.,,Exchange to miner flows may indicate OTC deals or operational payments
+miner-to-miner,Miner to Miner,inter-entity-flows,btc,Token flows between mining pools; tracking inter-miner fund movements.,,Miner to miner flows may indicate pool consolidation or partnerships
+miner-to-exchange,Miner to Exchange,inter-entity-flows,btc,Token flows from mining pools to exchanges; tracking miner selling behavior.,high flows miner selling pressure,Large miner to exchange flows often precede selling pressure on markets
+
+# ============================================================================
+# BTC - Fund Data
+# ============================================================================
+market-price-usd,Fund Market Price USD,fund-data,btc,USD price of fund-related stocks like GBTC; reflecting institutional investor sentiment in regulated markets.,,Fund price movements indicate traditional finance sentiment toward BTC exposure
+market-volume,Fund Market Volume,fund-data,btc,Traded volume of fund-related stocks; reflecting institutional trading activity.,,High fund volume indicates strong institutional interest and participation
+market-premium,Fund Market Premium,fund-data,btc,Premium or discount of fund shares vs NAV (Net Asset Value); indicating market sentiment.,positive premium bullish TradFi sentiment|negative premium bearish TradFi sentiment,Persistent premium indicates strong institutional demand; discount signals weak interest
+digital-asset-holdings,Digital Asset Holdings,fund-data,btc,Amount of BTC held by funds like Grayscale; indicating stock market investor sentiment.,rising holdings bullish institutional demand,Growing fund holdings signal increasing institutional adoption and demand
+
+# ============================================================================
+# BTC - Other
+# ============================================================================
+entity-list,Entity List,entity-status,btc,List of tracked entities including exchanges and miners with market type classification (spot vs derivative).,,Reference data for filtering and analyzing specific exchanges or miners
+stats-by-relative-fee,Mempool Stats by Fee,mempool,btc,Mempool statistics (transaction count; total size; total fee) categorized by fee level for unconfirmed transactions.,,Fee distribution reveals urgency of pending transactions and network congestion
+stats-in-total,Mempool Stats Total,mempool,btc,Average mempool statistics including transaction count; aggregate size; and total fees for unconfirmed transactions.,,Rising mempool congestion often accompanies high-activity market periods
+lightning-stats-in-total,Lightning Network Stats,lightning-network,btc,Lightning Network metrics including network capacity; node/channel counts; average capacities; and fee statistics.,,Growing Lightning capacity indicates increasing Layer 2 adoption and scalability
+companies,Mining Companies,miner-data,btc,Mining company data including coinbase rewards; total rewards; unique transactions; and production metrics for public miners.,,Public miner production data helps gauge institutional mining health and market supply
+
+# ============================================================================
+# ETH - Market Data
+# ============================================================================
+eth-price-ohlcv,Price OHLCV,market-data,eth,ETH price data including open; close; high; low; and volume. Provides CryptoQuant ETH Index Price and USD/USDT prices from global exchanges.,,Price movements indicate market sentiment and can be used to identify trends and entry/exit points
+eth-open-interest,Open Interest,market-data,eth,ETH Perpetual Open Interest from derivative exchanges; unified to USD value.,,Rising OI with price suggests trend strength; high OI indicates potential volatility
+eth-funding-rates,Funding Rates,market-data,eth,Represents traders' sentiments in perpetual swaps market. Positive rates mean bullish sentiment with longs paying shorts; negative rates mean bearish sentiment.,positive bullish longs pay shorts|negative bearish shorts pay longs,Extreme funding rates often precede reversals as overleveraged positions get liquidated
+eth-taker-buy-sell-stats,Taker Buy Sell Stats,market-data,eth,Taker buy/sell volumes and ratios in perpetual swap markets; showing which positions takers are taking.,,Higher taker buy ratio indicates aggressive buying; useful for short-term momentum signals
+eth-liquidations,Liquidations,market-data,eth,Sum of forced market orders to exit leveraged positions caused by price volatility; indicating current volatility and trader sentiment.,,Large liquidation spikes often signal local bottoms or tops as overleveraged traders are flushed out
+eth-coinbase-premium-index,Coinbase Premium Index,market-data,eth,Percent difference between Coinbase price (ETHUSD) and Binance price (ETHUSDT). Higher premium indicates stronger spot buying pressure.,high premium strong US buying pressure|negative premium weak US demand,Positive premium suggests institutional US buying interest; often preceding price rallies
+eth-capitalization,Capitalization,market-data,eth,Total market capitalization of ETH; calculated by multiplying circulating supply with USD price.,,Market cap trends help assess ETH dominance and overall market health
+
+# ============================================================================
+# ETH - Exchange Flows
+# ============================================================================
+eth-reserve,Exchange Reserve,exchange-flows,eth,Full historical on-chain balance of Ethereum exchanges.,,Declining reserves suggest accumulation and reduced sell pressure
+eth-transactions-count,Transactions Count,exchange-flows,eth,Number of transactions flowing in/out of Ethereum exchanges.,,High transaction counts indicate increased exchange activity and potential volatility
+eth-inflow,Exchange Inflow,exchange-flows,eth,ETH flowing into exchange wallets with average transaction values.,,Rising inflows often precede selling pressure as holders move to exchanges
+eth-outflow,Exchange Outflow,exchange-flows,eth,ETH flowing out of exchange wallets with average transaction values.,,Strong outflows indicate accumulation as investors move ETH to cold storage
+eth-addresses-count-ef,Exchange Addresses Count,exchange-flows,eth,Number of addresses involved in exchange inflow/outflow transactions.,,More unique addresses indicate broader market participation
+eth-netflow,Exchange Netflow,exchange-flows,eth,Difference between coins flowing into and out of exchanges; showing idle coins waiting to be traded.,positive potential sell pressure|negative accumulation,Negative netflow is bullish as it indicates more ETH leaving exchanges than entering
+
+# ============================================================================
+# ETH - Network Data
+# ============================================================================
+eth-block-bytes,Block Bytes,network-data,eth,Mean size in bytes of all blocks generated.,,Larger blocks indicate higher network utilization and demand for block space
+eth-block-count,Block Count,network-data,eth,Number of blocks generated in a given window.,,Consistent block production indicates healthy network operation
+eth-block-interval,Block Interval,network-data,eth,Average time between blocks generated; displayed in seconds.,,Stable block intervals indicate consistent network performance
+eth-fees,Fees,network-data,eth,Statistics related to fees paid from executing transactions; including total fees; average fee per block; and percentage of fees relative to block reward.,,High fees indicate network congestion and strong demand for block space
+eth-fees-burnt,Fees Burnt,network-data,eth,Total fees burnt in Ethereum chain by executing transactions; introduced after London upgrade.,,Higher burnt fees reduce ETH supply; potentially increasing scarcity value
+eth-fees-tips,Fees Tips,network-data,eth,Fees directly paid to Ethereum miners/validators; introduced after London upgrade.,,Tips reflect priority fee market dynamics and validator incentives
+eth-fees-transaction,Fees Transaction,network-data,eth,Average and median fees per transaction paid from executing transactions.,,Transaction fees indicate network demand and user willingness to pay for inclusion
+eth-blockreward,Blockreward,network-data,eth,Sum of block rewards including mining/staking rewards and transaction fees.,,Block rewards affect validator economics and ETH issuance rate
+eth-difficulty,Difficulty,network-data,eth,Mean difficulty of mining a new block.,,Higher difficulty indicates more mining competition and network security
+eth-hashrate,Hashrate,network-data,eth,Mean speed at which miners solve hash problems; displayed in hashes per second.,,Higher hashrate indicates stronger network security and miner commitment
+eth-supply,Supply,network-data,eth,Total amount of Ethereum in existence and newly issued tokens in a given window.,,Supply growth rate affects inflation and long-term value proposition
+eth-gas,Gas,network-data,eth,Statistics related to gas used including total gas; average gas used; average gas price in Gwei; and average gas limit.,,High gas usage indicates strong demand for Ethereum computational resources
+eth-base-fee,Base Fee,network-data,eth,Base fee per gas used to burn fees; introduced after London upgrade. Average value in Gwei.,,Base fee fluctuations indicate network congestion levels
+eth-velocity,Velocity,network-data,eth,Trailing 1 year transaction volume divided by current supply; measuring how actively money circulates.,,Higher velocity suggests more economic activity and usage as medium of exchange
+eth-contracts-count,Contracts Count,network-data,eth,Number of contracts created; destroyed; and total unique contracts on the network.,,Growing contract deployment indicates increasing developer activity
+eth-tokens-transferred,Tokens Transferred,network-data,eth,Transaction volume metrics including total; mean; and median tokens transferred per transaction.,,Transfer volume indicates economic throughput on the network
+eth-inflation,Inflation,network-data,eth,Daily inflation rate calculated by dividing newly issued tokens by total supply.,,Lower inflation rate is deflationary; potentially supporting price
+eth-top100,Top100,network-data,eth,Metrics relating to top 100 ETH rich holders addresses.,,Whale accumulation or distribution patterns can signal market direction
+eth-days-destroyed,Days Destroyed,network-data,eth,Tokens transferred multiplied by days since last movement; filtering noise by weighting recently dormant coins.,,High coin days destroyed suggests long-term holders are moving coins
+
+# ============================================================================
+# ETH - ETH2 / Staking
+# ============================================================================
+eth-total-value-staked,Total Value Staked,eth2,eth,Valid ETH balance of the deposit contract.,,Growing staked value indicates confidence in Ethereum 2.0 and reduces circulating supply
+eth-staking-inflow-total,Staking Inflow Total,eth2,eth,Valid ETH inflow into the deposit contract.,,Strong inflows indicate ongoing commitment to staking
+eth-staking-transaction-count,Staking Transaction Count,eth2,eth,Number of valid transactions to the deposit contract.,,Transaction counts show staking participation breadth
+eth-staking-validator-total,Staking Validator Total,eth2,eth,Number of total validators.,,More validators indicate stronger network decentralization and security
+eth-depositor-count-total,Depositor Count Total,eth2,eth,Number of unique accounts who deposited over 32 ETH to the deposit contract.,,Growing depositors show expanding staker base
+eth-depositor-count-new,Depositor Count New,eth2,eth,Number of new unique accounts who deposited over 32 ETH to the deposit contract.,,New depositor growth indicates fresh capital entering staking
+eth-staking-rate,Staking Rate,eth2,eth,Percentage of ETH 2.0 deposit contract balance to total supply.,,Higher staking rate reduces liquid supply and may support price
+
+# ============================================================================
+# ETH - Market Indicator
+# ============================================================================
+eth-estimated-leverage-ratio,Estimated Leverage Ratio,market-indicator,eth,Open interest divided by ETH reserve; estimating average user leverage. High leverage leads to rapid volatility.,high leverage high volatility risk|low leverage stable market,Elevated leverage ratios often precede sharp price movements and liquidation cascades
+
+# ============================================================================
+# ETH - Flow Indicator
+# ============================================================================
+eth-exchange-supply-ratio,Exchange Supply Ratio,flow-indicator,eth,Exchange reserve divided by total supply; measuring tokens reserved on exchanges relative to total supply.,,Lower ratio suggests more ETH in cold storage; reducing sell pressure potential
+
+# ============================================================================
+# ETH - Other
+# ============================================================================
+eth-entity-list,Entity List,entity-status,eth,List of entities including exchanges with market type classification (spot or derivative).,,Reference data for identifying tracked entities and their types
+eth-miner-reserve,Miner Reserve,miner-flows,eth,Full historical on-chain balance of mining pools.,,Miner reserve changes indicate potential selling or accumulation
+eth-miner-outflow,Miner Outflow,miner-flows,eth,ETH flowing out of mining pool wallets with average transaction values.,,Large miner outflows may indicate selling to cover operational costs
+eth-miner-revenue,Miner Revenue,miner-flows,eth,Amount earned by mining pools through block rewards including coinbase and transaction fees.,,Miner revenue affects mining profitability and network security
+eth-exchange-to-exchange,Exchange to Exchange,inter-entity-flows,eth,Token flows between exchanges including total flow; mean flow; and transaction count.,,Inter-exchange flows may indicate arbitrage activity or liquidity movement
+eth-miner-to-exchange,Miner to Exchange,inter-entity-flows,eth,Token flows from mining pools to exchanges including total flow; mean flow; and transaction count.,,Miner-to-exchange flows often precede selling pressure
+eth-fund-market-price,Fund Market Price USD,fund-data,eth,USD price of fund-related stocks like ETHE; reflecting regulated market investor sentiment.,,Fund prices indicate institutional demand in regulated markets
+eth-fund-market-volume,Fund Market Volume,fund-data,eth,Traded volume of fund-related stocks like ETHE; reflecting regulated market sentiment.,,High volume indicates strong institutional interest
+eth-fund-market-premium,Fund Market Premium,fund-data,eth,Premium calculated as (market price - NAV) / NAV indicating market sentiment.,high premium bullish but downside risk|low/negative premium bearish but upside potential,Premium levels indicate institutional sentiment and potential mean reversion opportunities
+eth-digital-asset-holdings,Digital Asset Holdings,fund-data,eth,Digital asset holdings status of funds like Grayscale ETH Holdings; indicating stock market sentiment.,,Rising holdings indicate institutional accumulation and bullish sentiment
+
+# ============================================================================
+# Stablecoin
+# ============================================================================
+stablecoin-price-ohlcv,Price OHLCV,market-data,stablecoin,Stablecoin price data including open; close; high; low; and volume. Price is calculated using VWAP from global exchanges.,,Significant deviation from $1 peg indicates market stress or depegging risk
+stablecoin-capitalization,Capitalization,market-data,stablecoin,Total market capitalization calculated by multiplying circulating supply with USD price.,,Rising market cap signals growing demand for stablecoins and potential buying power entering crypto markets
+stablecoin-reserve,Exchange Reserve,exchange-flows,stablecoin,Full historical on-chain balance of stablecoins held on exchanges.,,Increasing exchange reserves indicate dry powder ready to buy crypto assets
+stablecoin-inflow,Exchange Inflow,exchange-flows,stablecoin,Amount of stablecoins flowing into exchange wallets.,,Large stablecoin inflows to exchanges are bullish as they represent potential buying pressure
+stablecoin-outflow,Exchange Outflow,exchange-flows,stablecoin,Amount of stablecoins flowing out of exchange wallets.,,Stablecoin outflows from exchanges may indicate capital leaving the crypto market
+stablecoin-netflow,Exchange Netflow,exchange-flows,stablecoin,Difference between stablecoins flowing into exchanges and flowing out.,,Positive netflow (more inflows) is bullish as it indicates buying power accumulating on exchanges
+stablecoin-supply,Supply,network-data,stablecoin,Token supply metrics including total supply; circulating supply; minted; burned; issued; and redeemed amounts.,,Growing stablecoin supply indicates capital inflows to crypto markets and potential bullish momentum
+stablecoin-tokens-transferred,Tokens Transferred,network-data,stablecoin,Transaction volume metrics including total tokens transferred and mean tokens per transaction.,,High transfer volume indicates active usage and liquidity in stablecoin markets
+stablecoin-addresses-count,Addresses Count,network-data,stablecoin,Number of unique active addresses including senders and receivers on the blockchain.,,Growing active addresses indicate increasing adoption and network usage
+stablecoin-exchange-supply-ratio,Exchange Supply Ratio,flow-indicator,stablecoin,Exchange reserve divided by total supply; measuring the proportion of tokens held on exchanges relative to total supply.,,Higher ratios indicate more stablecoins ready for trading; rising ratios suggest potential buying pressure
+stablecoin-entity-list,Entity List,entity-status,stablecoin,List of entities (exchanges; banks) holding stablecoins with market type classification.,,Useful for identifying which exchanges and entities hold significant stablecoin reserves
+
+# ============================================================================
+# ERC20
+# ============================================================================
+erc20-price-ohlcv,Price OHLCV,market-data,erc20,ERC20 token index price data including open; high; low; close; and volume. Calculated using VWAP from global exchanges.,,Use price and volume trends to identify momentum and potential breakout or breakdown levels
+erc20-reserve,Exchange Reserve,exchange-flows,erc20,Full historical on-chain ERC20 token balance held on exchanges.,,Rising reserves suggest increased selling pressure; declining reserves indicate accumulation and potential bullish sentiment
+erc20-inflow,Exchange Inflow,exchange-flows,erc20,Amount of ERC20 tokens flowing into exchange wallets.,,High inflows typically signal potential selling pressure as tokens move to exchanges for trading
+erc20-outflow,Exchange Outflow,exchange-flows,erc20,Amount of ERC20 tokens flowing out of exchange wallets.,,High outflows suggest accumulation as investors move tokens to cold storage for long-term holding
+erc20-netflow,Exchange Netflow,exchange-flows,erc20,Difference between exchange inflows and outflows; measuring net change in idle tokens on exchanges.,,Positive netflow signals bearish pressure; negative netflow indicates bullish accumulation as tokens leave exchanges
+erc20-supply,Supply,network-data,erc20,ERC20 token supply metrics including total supply; newly minted tokens; and burned tokens.,,Monitor supply changes to assess inflationary or deflationary dynamics affecting token value
+erc20-transactions-count,Transactions Count,network-data,erc20,Total and mean number of transactions executed by the ERC20 contract.,,Rising transaction counts indicate growing network usage and adoption momentum
+erc20-addresses-count,Addresses Count,network-data,erc20,Number of active addresses including senders and receivers interacting with the token.,,Increasing active addresses signal growing adoption and network health
+erc20-tokens-transferred,Tokens Transferred,network-data,erc20,Transaction volume metrics including total; mean; and median tokens transferred per transaction.,,Large transfer volumes may indicate whale activity or significant market positioning
+erc20-velocity,Velocity,network-data,erc20,Token velocity calculated as trailing 1-year transaction volume divided by current supply.,,High velocity suggests active trading; low velocity indicates holding behavior and potential price stability
+erc20-exchange-supply-ratio,Exchange Supply Ratio,flow-indicator,erc20,Ratio of exchange reserve to total supply; measuring the proportion of tokens held on exchanges.,,Rising ratio indicates more tokens available for selling; declining ratio suggests accumulation and reduced sell pressure
+erc20-entity-list,Entity List,entity-status,erc20,List of tracked entities for ERC20 tokens including exchanges and their market types.,,Use entity data to filter and analyze flows across specific exchanges or entity types
+
+# ============================================================================
+# XRP
+# ============================================================================
+xrp-price-ohlcv,Price OHLCV,market-data,xrp,XRP price data including open; close; high; low; and 24h trading volume from spot and perpetual markets.,,Rising volume with price increase confirms bullish momentum; divergence may signal trend reversal
+xrp-open-interest,Open Interest,market-data,xrp,Total value of outstanding XRP perpetual futures contracts across derivative exchanges; unified in USD.,,Rising open interest with price increase indicates strong trend; declining OI suggests position unwinding
+xrp-funding-rates,Funding Rates,market-data,xrp,Funding rates reflect trader sentiment in perpetual swaps. Positive rates indicate bullish bias; negative rates indicate bearish sentiment.,Positive bullish sentiment|Negative bearish sentiment,Extreme positive funding rates often precede corrections as overleveraged longs get liquidated
+xrp-taker-buy-sell-stats,Taker Buy Sell Stats,market-data,xrp,Taker sentiment metrics showing buy/sell volumes; ratios; and total volume from perpetual swap trades.,buy_sell_ratio >1 buying pressure|<1 selling pressure,High taker buy ratio indicates aggressive buying and potential bullish momentum
+xrp-estimated-leverage-ratio,Estimated Leverage Ratio,market-data,xrp,Ratio of open interest divided by exchange reserve; measuring average leverage used by traders.,,High leverage ratio indicates elevated risk appetite; sudden drops may signal deleveraging events
+xrp-liquidations,Liquidations,market-data,xrp,Sum of forced liquidations from leveraged positions due to price volatility.,,Large liquidation spikes often mark local tops or bottoms as overleveraged positions get flushed
+xrp-capitalization,Capitalization,market-data,xrp,Total market capitalization of XRP calculated by multiplying total supply with USD price.,,Market cap trends help gauge XRP's relative market position and overall investor interest
+xrp-addresses-count,Addresses Count,network-data,xrp,Number of unique XRP addresses including active; sender; and receiver addresses.,,Increasing active addresses signals growing network adoption and user engagement
+xrp-velocity,Velocity,network-data,xrp,Measures how quickly XRP circulates in the network; calculated as on-chain volume divided by market cap.,,Higher velocity suggests increased economic activity and token utility on the network
+xrp-nvt,NVT,network-indicator,xrp,Network Value to Transaction ratio comparing market cap to on-chain transaction volume.,High NVT potentially overvalued|Low NVT potentially undervalued,Elevated NVT suggests price may be outpacing network utility; low NVT indicates undervaluation
+xrp-reserve,Entity Reserve,entity-flows,xrp,Historical on-chain XRP balance held by XRP Ledger entities such as exchanges.,,Declining exchange reserves suggest accumulation; rising reserves may signal selling pressure
+xrp-inflow,Entity Inflow,entity-flows,xrp,Amount of XRP flowing into entity addresses such as exchanges.,,Large exchange inflows typically signal potential selling pressure ahead
+xrp-outflow,Entity Outflow,entity-flows,xrp,Amount of XRP flowing out of entity addresses such as exchanges.,,Sustained outflows from exchanges suggest accumulation and reduced sell pressure
+xrp-whale-movements,Whale Movements,entity-flows,xrp,Transaction counts and transfer volumes associated with whale addresses.,,Large whale movements often precede significant price volatility
+xrp-exchange-supply-ratio,Exchange Supply Ratio,flow-indicator,xrp,Ratio of exchange XRP reserves compared to total XRP supply.,,Declining exchange supply ratio indicates accumulation trend; rising ratio suggests increased sell pressure
+xrp-dex-volume,DEX Volume,dex-data,xrp,XRP trading volume on the native XRPL decentralized exchange.,,Rising DEX volume indicates growing on-chain trading activity and decentralized liquidity
+xrp-dex-liquidity,DEX Liquidity,dex-data,xrp,Total USD liquidity available in the XRPL native decentralized exchange.,,Higher DEX liquidity enables better price execution and attracts more traders
+xrp-amm-liquidity,AMM Liquidity,amm-data,xrp,Total liquidity amount in XRPL AMM pools for non-XRP/XRP trading pairs.,,Growing AMM liquidity improves trading efficiency and reduces slippage for swaps
+xrp-entity-list,Entity List,entity-status,xrp,List of tracked XRP Ledger entities including exchanges; builders; team; foundation; custody; OTC; banks; and bridges.,,Understanding entity classification helps contextualize flow data and market dynamics
+
+# ============================================================================
+# TRX
+# ============================================================================
+trx-price-ohlcv,Price OHLCV,market-data,trx,TRX price data including open; close; high; low; and trading volume from spot markets.,,Price and volume trends help identify momentum and potential trend reversals
+trx-capitalization,Capitalization,market-data,trx,Total market capitalization of TRX calculated by multiplying total supply with USD price.,,Market cap changes reflect investor sentiment and TRX's relative market position
+trx-supply,Supply,network-data,trx,TRX supply metrics including total; circulating; minted; burned; and staked amounts.,,Supply dynamics from minting and burning affect long-term tokenomics and price
+trx-transactions-count,Transactions Count,network-data,trx,Total and mean number of transactions on the TRON network.,,Transaction growth indicates increasing network utility and blockchain adoption
+trx-addresses-count,Addresses Count,network-data,trx,Number of unique TRX addresses including active; sender; and receiver addresses.,,Growing active addresses signal expanding user base and network adoption
+trx-tokens-transferred,Tokens Transferred,network-data,trx,Total; mean; and median TRX tokens transferred on-chain in the given period.,,Transfer volume trends help identify accumulation or distribution phases
+trx-fees,Fees,network-data,trx,Transaction fees on TRON including total fees; USD value; and average fee per block.,,Rising fees indicate increased network demand and potential congestion
+trx-tps,TPS,network-data,trx,Transactions per second processed on the TRON network.,,Higher TPS demonstrates network scalability and capacity to handle increased load
+trx-total-value-staked,Total Value Staked,network-data,trx,Total TRX staked across Stake 1.0 (legacy) and Stake 2.0 (newer) staking models.,,High staking levels reduce circulating supply and indicate long-term holder confidence
+trx-staking-rate,Staking Rate,network-data,trx,Percentage of TRX supply that is staked on the network.,,Higher staking rates suggest strong holder commitment and reduced sell pressure
+trx-sunpump-tokens,Sunpump Tokens,defi,trx,Token creation metrics on SunPump platform including creation count and cumulative events.,,Rising token creation indicates growing developer interest in TRON DeFi ecosystem
+trx-sunswap-activity,Sunswap Activity,defi,trx,Sunswap DEX activity including transaction counts; WTRX volume; dominance; and USD values.,,Sunswap activity levels reflect TRON DeFi adoption and decentralized trading demand
+
+# ============================================================================
+# ALT
+# ============================================================================
+alt-price-ohlcv,Price OHLCV,market-data,alt,Alt token index price data including open; high; low; close prices and volume. Calculated using VWAP from global exchanges.,,Use price and volume trends to identify momentum shifts and potential breakout or reversal points in altcoin markets

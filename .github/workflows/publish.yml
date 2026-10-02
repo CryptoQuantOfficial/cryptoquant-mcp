@@ -7,6 +7,7 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    # id-token: write lets npm publish via Trusted Publishing (OIDC); no NPM_TOKEN needed.
     permissions:
       contents: read
       id-token: write
@@ -20,6 +21,9 @@ jobs:
         with:
           node-version: "20"
           registry-url: "https://registry.npmjs.org"
+
+      - name: Use npm 11 (trusted publishing needs npm >= 11.5.1)
+        run: npm install -g npm@^11.5.1 && npm --version
 
       - name: Install dependencies
         run: npm ci
@@ -47,11 +51,7 @@ jobs:
       - name: Publish pre-release to npm (beta tag)
         if: ${{ github.event.release.prerelease }}
         run: npm publish --access public --provenance --tag beta
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish to npm (latest)
         if: ${{ !github.event.release.prerelease }}
         run: npm publish --access public --provenance
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

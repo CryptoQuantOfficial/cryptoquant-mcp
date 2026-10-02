@@ -8,7 +8,7 @@ Thank you for your interest in contributing to CryptoQuant MCP Server! This guid
 
 - Node.js v18+
 - npm
-- [CryptoQuant API key](https://cryptoquant.com/settings/api)
+- [CryptoQuant API key](https://cryptoquant.com/account/api)
 
 ### Local Development Setup
 
@@ -31,21 +31,19 @@ npm run dev
 
 ```
 cryptoquant-mcp/
+├── plugin.json         # Agent Plugins manifest
+├── mcp.json            # Remote MCP server for the plugin
+├── skills/             # Agent skills shipped with the plugin
 ├── src/
-│   ├── auth/           # Authentication logic
-│   ├── cache/          # Caching utilities
-│   ├── data/           # Static data files
-│   ├── tools/          # MCP tool implementations
-│   ├── config.ts       # Configuration
-│   ├── discovery.ts    # Endpoint discovery
-│   ├── index.ts        # Entry point
-│   ├── permissions.ts  # API permissions
-│   ├── plan-limits.ts  # Plan-based rate limits
-│   └── utils.ts        # Utility functions
-├── dist/               # Build output
+│   ├── index.ts        # Entry point: resolve URL and key, start the proxy
+│   ├── api-key.ts      # API key resolution
+│   ├── config.ts       # Server URL validation
+│   ├── proxy.ts        # stdio <-> Streamable HTTP relay
+│   └── utils.ts        # stderr logger
+├── test/               # Integration tests, schemas, fixtures
 ├── package.json
 ├── tsconfig.json
-└── eslint.config.js
+└── eslint.config.mjs
 ```
 
 ## How to Contribute
@@ -67,15 +65,15 @@ cryptoquant-mcp/
 
 ### Contribution Areas
 
-#### MCP Tools
-- Add new tools in `src/tools/`
-- Improve existing tool functionality
-- Add new endpoint support
+#### Tools
 
-#### Core Features
-- Improve authentication in `src/auth/`
-- Enhance caching in `src/cache/`
-- Fix bugs or improve error handling
+Tools live in the remote server, not in this repository. Report tool issues here and we will route them.
+
+#### Plugin and proxy
+
+- Improve the `cryptoquant-onchain` skill (`skills/`)
+- Proxy reliability and error messages (`src/proxy.ts`)
+- Documentation and client setup guides
 
 #### Documentation
 - Improve README.md
@@ -91,6 +89,7 @@ cryptoquant-mcp/
 | `npm run dev` | Run in watch mode |
 | `npm run lint` | Run ESLint |
 | `npm run test` | Run tests with Vitest |
+| `npm run sync:metric-ids` | Refresh test/fixtures/metric-ids.txt from a local server clone |
 | `npm start` | Run built server |
 
 ### Pre-commit Hooks

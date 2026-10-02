@@ -1,169 +1,48 @@
 #!/usr/bin/env node
 
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-
-import { registerAuthTools } from "./tools/auth.js";
-import { registerCoreTools } from "./tools/core.js";
+import { invalidKeyMessage, isValidApiKey, keySourceLabel, missingKeyMessage, resolveApiKey } from "./api-key.js";
+import { ConfigError, resolveServerUrl } from "./config.js";
+import { startProxy } from "./proxy.js";
 import { logger } from "./utils.js";
 
-// =============================================================================
-// Type Exports - Discovery
-// =============================================================================
-export type {
-  EndpointParameter,
-  DiscoveryEndpoint,
-  DiscoveryResponse,
-  ParsedEndpoint,
-  EndpointCatalog,
-  DiscoverySummary,
-} from "./discovery.js";
+async function main(): Promise<number> {
+  let url: URL;
+  try {
+    url = resolveServerUrl();
+  } catch (error) {
+    if (error instanceof ConfigError) {
+      process.stderr.write(`[cryptoquant-mcp] ${error.message}\n`);
+      return 1;
+    }
+    throw error;
+  }
 
-export {
-  fetchDiscoveryEndpoints,
-  getEndpointCatalog,
-  isDiscoveryLoaded,
-  searchEndpoints,
-  getEndpointByPath,
-  getParameterOptions,
-  getDiscoverySummary,
-  getAssetCategoryMap,
-  resetDiscovery,
-} from "./discovery.js";
+  const resolved = resolveApiKey();
+  if (!resolved) {
+    process.stderr.write(missingKeyMessage());
+    return 1;
+  }
 
-// =============================================================================
-// Type Exports - Permissions
-// =============================================================================
-export type { PermissionState, InitializeResult } from "./permissions.js";
+  if (!isValidApiKey(resolved.key)) {
+    process.stderr.write(invalidKeyMessage(resolved.source));
+    return 1;
+  }
 
-export {
-  initializePermissions,
-  getPermissionState,
-  setGuestMode,
-  resetPermissions,
-  clearDiscoveryCache,
-  getDiscoveryCachePath,
-  getCachedDiscovery,
-} from "./permissions.js";
+  logger.info(`CryptoQuant MCP proxy → ${url.origin}${url.pathname} (API key from ${keySourceLabel(resolved.source)})`);
 
-// =============================================================================
-// Type Exports - Plan Limits
-// =============================================================================
-export type {
-  DurationLimit,
-  UserPlan,
-  MetricLimits,
-  PlanLimits,
-  ApiRateLimit,
-  PlanLimitsState,
-  FetchPlanLimitsResult,
-  DateRangeValidation,
-  AccessibleEndpointInfo,
-  AccessibleEndpointsSummary,
-} from "./plan-limits.js";
-
-export {
-  fetchPlanLimits,
-  getPlanLimitsState,
-  getPlanLimit,
-  getEndpointResultLimit,
-  getEndpointWindowLimits,
-  hasEndpointAccess,
-  parseDurationToDate,
-  getEarliestAllowedDate,
-  validateDateRange,
-  getRequiredPlan,
-  getApiRateLimit,
-  getStaticEndpoints,
-  resetPlanLimits,
-  loadPlanLimitsFromCache,
-  getAccessibleEndpointsSummary,
-  detectPlanFromLimits,
-} from "./plan-limits.js";
-
-// =============================================================================
-// Type Exports - Cache
-// =============================================================================
-export type {
-  MyDiscoveryRawResponse,
-  DiscoverySummaryData,
-  CacheMetadata,
-  DiscoveryCacheSchema,
-  CompactInitializeResponse,
-} from "./cache/types.js";
-
-export { CACHE_VERSION, CACHE_TTL_DAYS } from "./cache/types.js";
-
-export {
-  getCacheFilePath,
-  isCacheValid,
-  readCache,
-  writeCache,
-  invalidateCache,
-  clearAllCaches,
-  getCacheAgeDays,
-  getCacheStatus,
-  getCachePath,
-} from "./cache/storage.js";
-
-export { generateSummary, extractRawResponse } from "./cache/summary.js";
-
-// =============================================================================
-// Type Exports - Auth Storage
-// =============================================================================
-export type { StoredCredentials } from "./auth/storage.js";
-
-export {
-  getStoredApiKey,
-  saveApiKey,
-  updateValidatedAt,
-  clearCredentials,
-  getCredentialsPath,
-} from "./auth/storage.js";
-
-// =============================================================================
-// Utility Exports
-// =============================================================================
-export {
-  jsonResponse,
-  errorResponse,
-  getPlanNote,
-  capitalizeFirst,
-  logger,
-} from "./utils.js";
-
-// =============================================================================
-// Config Exports
-// =============================================================================
-export { getApiUrl, getApiBaseUrl } from "./config.js";
-
-// =============================================================================
-// Tool Registration Exports
-// =============================================================================
-export { registerAuthTools } from "./tools/auth.js";
-export { registerCoreTools } from "./tools/core.js";
-
-// =============================================================================
-// MCP Server Startup
-// =============================================================================
-async function main(): Promise<void> {
-  const server = new McpServer({
-    name: "cryptoquant",
-    version: "1.0.0",
-  });
-
-  // Register tool categories
-  registerAuthTools(server);
-  registerCoreTools(server);
-
-  // Start server with stdio transport
-  const transport = new StdioServerTransport();
-  await server.connect(transport);
-
-  logger.info("CryptoQuant MCP Server running on stdio");
+  const proxy = await startProxy({ url, apiKey: resolved.key });
+  await proxy.closed;
+  return 0;
 }
 
-main().catch((error) => {
-  logger.error("Failed to start server:", error);
-  process.exit(1);
-});
+main().then(
+  (code) => {
+    // Let stdout/stderr drain instead of exiting mid-write; force exit if a handle lingers.
+    process.exitCode = code;
+    setTimeout(() => process.exit(code), 1_000).unref();
+  },
+  (error: unknown) => {
+    logger.error("Fatal:", error instanceof Error ? error.message : String(error));
+    process.exit(1);
+  },
+);

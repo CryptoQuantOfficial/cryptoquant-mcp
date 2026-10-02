@@ -1,25 +1,31 @@
-/**
- * Centralized configuration for CryptoQuant MCP Server
- *
- * API URL Priority:
- * 1. CRYPTOQUANT_API_URL environment variable (optional override)
- * 2. Default production URL
- */
+export const DEFAULT_MCP_URL = "https://mcp.cryptoquant.com/mcp";
 
-const DEFAULT_API_URL = "https://api.cryptoquant.com/v1";
+export class ConfigError extends Error {
+  override name = "ConfigError";
+}
 
-/**
- * Get the configured API URL.
- * Returns the base URL with /v1 suffix (e.g., "https://api.cryptoquant.com/v1")
- */
-export function getApiUrl(): string {
-  return process.env.CRYPTOQUANT_API_URL || DEFAULT_API_URL;
+function isLoopback(hostname: string): boolean {
+  return hostname === "localhost" || hostname === "[::1]" || /^127(\.\d{1,3}){3}$/.test(hostname);
 }
 
 /**
- * Get the API base URL without version suffix.
- * Returns the base URL (e.g., "https://api.cryptoquant.com")
+ * CRYPTOQUANT_MCP_URL overrides the server (stage testing). The API key travels
+ * in a header, so plain http is allowed only when it cannot leave the machine.
  */
-export function getApiBaseUrl(): string {
-  return getApiUrl().replace(/\/v1$/, "");
+export function resolveServerUrl(env: NodeJS.ProcessEnv = process.env): URL {
+  const raw = env.CRYPTOQUANT_MCP_URL?.trim();
+  if (!raw) return new URL(DEFAULT_MCP_URL);
+
+  let url: URL;
+  try {
+    url = new URL(raw);
+  } catch {
+    throw new ConfigError("CRYPTOQUANT_MCP_URL is not a valid URL.");
+  }
+
+  if (url.protocol === "https:") return url;
+  if (url.protocol === "http:" && isLoopback(url.hostname)) return url;
+  throw new ConfigError(
+    "CRYPTOQUANT_MCP_URL must use https (plain http is allowed only for localhost, 127.0.0.0/8, and [::1]).",
+  );
 }

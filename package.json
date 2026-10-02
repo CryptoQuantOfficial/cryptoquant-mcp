@@ -1,7 +1,7 @@
 {
   "name": "cryptoquant-mcp",
   "mcpName": "com.cryptoquant/mcp-server",
-  "version": "0.3.0-beta.1",
+  "version": "1.0.0",
   "description": "CryptoQuant MCP stdio proxy - connects MCP clients to the remote CryptoQuant MCP server",
   "type": "module",
   "bin": {

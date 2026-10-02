@@ -2,9 +2,7 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## [0.3.0-beta.1] - 2026-10-02
-
-Pre-release of 1.0.0. Install with `npx -y cryptoquant-mcp@beta`.
+## [1.0.0] - 2026-10-02
 
 ### Changed (breaking)
 

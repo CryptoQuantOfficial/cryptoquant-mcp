@@ -1,107 +1,74 @@
-# CryptoQuant MCP Server
+# CryptoQuant MCP
 
-<p align="center">
-  <strong>On-Chain Analytics for Claude and AI Coding Agents</strong>
-</p>
+[![npm version](https://img.shields.io/npm/v/cryptoquant-mcp.svg)](https://www.npmjs.com/package/cryptoquant-mcp)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-<p align="center">
-  <a href="#installation">Installation</a> •
-  <a href="#mcp-tools">MCP Tools</a> •
-  <a href="#authentication">Authentication</a>
-</p>
+CryptoQuant on-chain, market, and derivatives data, plus CryptoQuant Research and QuickTake insights, for AI agents through the [Model Context Protocol](https://modelcontextprotocol.io).
 
----
+This repository contains:
 
-## What is this?
+- **Remote server setup** for `https://mcp.cryptoquant.com/mcp` (recommended; you sign in with OAuth)
+- **An Agent Plugins / Cursor plugin** (`plugin.json`, `mcp.json`, `skills/`) that connects to the remote server and teaches the agent which metric answers which question
+- **A local stdio proxy** (`npx cryptoquant-mcp`) for clients that cannot connect to remote MCP servers. It forwards every message to the remote server unchanged.
 
-CryptoQuant MCP Server brings on-chain analytics directly into your AI assistant:
+<!-- TODO: demo GIF (to be recorded by the CryptoQuant team) -->
 
-- **Natural language queries**: Ask in any language - "비트코인 가격 전망?" or "Is BTC overvalued?"
-- **Real-time metrics**: MVRV, SOPR, Exchange Flows, Funding Rates
-- **Market insights**: AI-powered interpretation of on-chain data
-- **Whale tracking**: Monitor large holder movements
+## Remote server (recommended)
 
----
+Server URL: `https://mcp.cryptoquant.com/mcp` (Streamable HTTP, OAuth)
 
-## Installation
+No API key is needed in your config. The first time you connect, your client opens a CryptoQuant sign-in page.
 
-### Quick Start (Claude Desktop, Cursor, etc.)
+### Claude (claude.ai and Claude Desktop)
 
-**Step 1**: Add to your MCP config file:
+Open **Settings → Connectors → Add custom connector** and paste the server URL.
 
-| App | Config File |
-|-----|-------------|
-| **Claude Desktop (Mac)** | `~/Library/Application Support/Claude/claude_desktop_config.json` |
-| **Claude Desktop (Windows)** | `%APPDATA%\Claude\claude_desktop_config.json` |
-| **Claude Code** | `~/.claude/mcp.json` or project `.mcp.json` |
-| **Cursor** | Project `.cursor/mcp.json` |
+### ChatGPT
+
+Add a custom connector with the server URL (developer mode). Availability depends on your ChatGPT plan.
+
+### Cursor
+
+Install the **CryptoQuant** plugin from the Cursor marketplace (once listed). It adds the remote server and the `cryptoquant-onchain` skill.
+
+Or add the server yourself in `.cursor/mcp.json` (project) or `~/.cursor/mcp.json` (global):
 
 ```json
 {
   "mcpServers": {
     "cryptoquant": {
-      "command": "npx",
-      "args": ["-y", "cryptoquant-mcp"]
+      "url": "https://mcp.cryptoquant.com/mcp"
     }
   }
 }
 ```
 
-**Step 2**: Restart your app
+### VS Code
 
-**Step 3**: Call `initialize()` to verify connection. Done!
+`.vscode/mcp.json`:
 
-### Local Development
-
-For contributors:
-
-```bash
-git clone https://github.com/CryptoQuantOfficial/cryptoquant-mcp.git
-cd cryptoquant-mcp
-npm install && npm run build
+```json
+{
+  "servers": {
+    "cryptoquant": {
+      "type": "http",
+      "url": "https://mcp.cryptoquant.com/mcp"
+    }
+  }
+}
 ```
 
----
+### Claude Code
 
-## MCP Tools
+```bash
+claude mcp add --transport http cryptoquant https://mcp.cryptoquant.com/mcp
+```
 
-The MCP server provides these tools for API access:
+Then run `/mcp` in Claude Code to sign in.
 
-| Tool | Description |
-|------|-------------|
-| `initialize` | Start session with API key, returns plan info |
-| `discover_endpoints` | Browse 245+ available endpoints |
-| `get_endpoint_info` | Get endpoint parameter details |
-| `query_data` | Query raw API data |
-| `describe_metric` | Get metric descriptions and thresholds |
-| `list_assets` | List supported assets |
-| `reset_session` | Clear session (logout) |
+## Local install (npx proxy)
 
-### Supported Assets
-
-BTC, ETH, ALT, Stablecoin, ERC20, TRX, XRP
-
----
-
-## Natural Language Queries
-
-Ask questions in any language - Claude will route to the right metrics:
-
-| Query | Intent | Metric |
-|-------|--------|--------|
-| "비트코인 가격 전망이 어때?" | VALUATION | MVRV |
-| "Is BTC overvalued?" | VALUATION | MVRV |
-| "고래들 움직임 보여줘" | WHALE_ACTIVITY | whale-ratio |
-| "What's the funding rate?" | LEVERAGE | funding-rates |
-| "익절/손절 상황?" | PROFIT_BEHAVIOR | SOPR |
-
----
-
-## Authentication
-
-### Option A. Environment Variable (Recommended)
-
-Add your API key to the MCP config:
+For clients that only support local (stdio) servers. Requires Node.js 18+ and a [CryptoQuant API key](https://cryptoquant.com/account/api).
 
 ```json
 {
@@ -117,67 +84,59 @@ Add your API key to the MCP config:
 }
 ```
 
-### Option B. Direct Parameter
+| Variable | Required | Description |
+| --- | --- | --- |
+| `CRYPTOQUANT_API_KEY` | Yes | Your API key, sent to the remote server as a bearer token. If it is not set, the key saved by 0.x in `~/.cryptoquant/credentials` is used. |
+| `CRYPTOQUANT_MCP_URL` | No | Overrides the server URL (default `https://mcp.cryptoquant.com/mcp`). Must be `https`; plain `http` is accepted only for loopback addresses (`localhost`, `127.0.0.1`, `[::1]`). |
 
-Call `initialize()` with your API key:
+Without a key, the proxy prints setup instructions to stderr and exits.
 
-```
-initialize(api_key="your-api-key")
-```
+## Tools
 
-The key will be saved to `~/.cryptoquant/credentials` for future sessions.
+The tools come from the remote server. This list is for reference and may change.
 
-**Get your API key**: [https://cryptoquant.com/settings/api](https://cryptoquant.com/settings/api)
+| Tool | Description |
+| --- | --- |
+| `discover_endpoints` | Find data endpoints by asset and category |
+| `get_endpoint_info` | Parameters of an endpoint (window, exchange, token, ...) |
+| `query_data` | Query on-chain, market, and derivatives data |
+| `describe_metric` | Definition, thresholds, and interpretation of a metric |
+| `list_assets` | Supported assets |
+| `recent_research` | Latest CryptoQuant Research articles |
+| `recent_quicktake` | Latest QuickTake articles from CryptoQuant Verified Authors |
+| `query_research` | Search Research articles by topic |
+| `query_quicktake` | Search QuickTake articles by topic |
 
-### Managing Credentials
+## Assets, dates, and rate limits
 
-```bash
-# Switch accounts
-reset_session(clear_stored=true)
-initialize(api_key="new-api-key")
-```
+- **Assets:** BTC, ETH, XRP, TRX, stablecoins, ERC-20 tokens, and other altcoins. `list_assets` returns the current list.
+- **Dates:** `yyyyMMdd` for `window=day` (e.g. `20260115`), `yyyyMMddTHHmmss` for other windows (e.g. `20260115T000000`).
+- **Rate limits and history:** depend on your CryptoQuant plan. The server tells the agent your plan's limits when it connects. See [plans](https://cryptoquant.com/pricing).
 
----
+## Migrating from 0.x
 
-## Requirements
+1.0 turns the npm package into a proxy to the remote server, so the local and remote servers now offer the same tools.
 
-| Component | Requirement |
-|-----------|-------------|
-| Node.js | v18+ |
-| API Access | [CryptoQuant API key](https://cryptoquant.com/settings/api) |
+- The `initialize` and `reset_session` tools are removed. Set `CRYPTOQUANT_API_KEY` in your MCP config instead. A key you saved in 0.x with `initialize(api_key=...)` keeps working; it is read from `~/.cryptoquant/credentials`.
+- QuickTake and Research tools are now available locally.
+- The package no longer exports a JavaScript library API.
+- `CRYPTOQUANT_API_URL` (the 0.x API base URL override) is no longer used; use `CRYPTOQUANT_MCP_URL` to point at another MCP server.
+- `npx -y cryptoquant-mcp` always fetches the latest version, so existing configs switch to 1.0 on the next start. Prompts or workflows that call `initialize` need to be updated.
 
----
-
-## License
-
-MIT License - see [LICENSE](LICENSE)
-
----
+See [CHANGELOG.md](CHANGELOG.md).
 
 ## Development
 
-### Setup
-
-After cloning the repository, install dependencies to set up git hooks:
-
 ```bash
+git clone https://github.com/CryptoQuantOfficial/cryptoquant-mcp.git
+cd cryptoquant-mcp
 npm install
+npm test
+npm run build
 ```
 
-This automatically configures [husky](https://typicode.github.io/husky/) for pre-commit hooks.
+See [CONTRIBUTING.md](CONTRIBUTING.md).
 
-### Pre-commit Hooks
+## License
 
-When committing changes to `src/`, ESLint runs automatically:
-
-- Lint check runs only when files in `src/` are staged
-- Commit is blocked if lint errors are found
-- Fix errors before committing: `npm run lint`
-
----
-
-<p align="center">
-  <a href="https://cryptoquant.com">CryptoQuant</a> •
-  <a href="https://docs.cryptoquant.com">Docs</a> •
-  <a href="https://github.com/CryptoQuantOfficial/cryptoquant-mcp/issues">Issues</a>
-</p>
+MIT. See [LICENSE](LICENSE).

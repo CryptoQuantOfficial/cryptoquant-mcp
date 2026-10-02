@@ -17,7 +17,7 @@ This repository contains:
 
 Server URL: `https://mcp.cryptoquant.com/mcp` (Streamable HTTP, OAuth)
 
-No API key is needed in your config. The first time you connect, your client opens a CryptoQuant sign-in page.
+No API key is needed in your config. The first time you connect, your client opens a CryptoQuant sign-in page. More setup details: [CryptoQuant user guide](https://userguide.cryptoquant.com/api/mcp-server-beta/remote-mcp-recommended).
 
 ### Claude (claude.ai and Claude Desktop)
 
@@ -83,6 +83,13 @@ For clients that only support local (stdio) servers. Requires Node.js 18+ and a 
   }
 }
 ```
+
+| App | Config file |
+| --- | --- |
+| Claude Desktop (macOS) | `~/Library/Application Support/Claude/claude_desktop_config.json` |
+| Claude Desktop (Windows) | `%APPDATA%\Claude\claude_desktop_config.json` |
+| Cursor | `.cursor/mcp.json` or `~/.cursor/mcp.json` |
+| Claude Code | project `.mcp.json` |
 
 | Variable | Required | Description |
 | --- | --- | --- |

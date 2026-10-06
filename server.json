@@ -1,0 +1,41 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "com.cryptoquant/mcp-server",
+  "title": "CryptoQuant",
+  "description": "Query cryptocurrency on-chain data, OHLCV prices, market data, and Research & QuickTake insights.",
+  "version": "1.0.0",
+  "websiteUrl": "https://userguide.cryptoquant.com/api/mcp-server-beta/remote-mcp-recommended",
+  "repository": {
+    "url": "https://github.com/CryptoQuantOfficial/cryptoquant-mcp",
+    "source": "github"
+  },
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://mcp.cryptoquant.com/mcp"
+    }
+  ],
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "cryptoquant-mcp",
+      "version": "1.0.0",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "CRYPTOQUANT_API_KEY",
+          "description": "Your CryptoQuant API key (https://cryptoquant.com/account/api)",
+          "isRequired": true,
+          "isSecret": true
+        },
+        {
+          "name": "CRYPTOQUANT_MCP_URL",
+          "description": "Overrides the remote server URL (default https://mcp.cryptoquant.com/mcp)",
+          "isRequired": false
+        }
+      ]
+    }
+  ]
+}
